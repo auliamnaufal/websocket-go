@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Univer Server</title>
+  </head>
+
+  <body>
+    <div
+      class="container"
+      style="width: 100%; display: grid; grid-template-columns: 50% 50%"
+    >
+      <div id="container-log"></div>
+      <div>
+        <button id="send-button" type="button">Send Random Data</button>
+      </div>
+    </div>
+
+    <script>
+      var ws = new WebSocket("ws://localhost:8448/ws");
+      const containerElement = document.getElementById("container-log");
+      const sendButtonElement = document.getElementById("send-button");
+      //Triggered when the connection is opened
+      ws.onopen = function (evt) {
+        console.log("Connection open...");
+        ws.send("Hello World of websockets!");
+        containerElement.innerHTML += `<p>Connection open...</p>`;
+      };
+      //Triggered when a message is received
+      ws.onmessage = function (evt) {
+        containerElement.innerHTML += `<p>Received Message: ${evt.data}</p>`;
+      };
+      //Triggered when the connection is closed
+      ws.onclose = function (evt) {
+        console.log("Connection closed.");
+        containerElement.innerHTML += `<p>Connection closed.</p>`;
+      };
+
+      sendButtonElement.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const data = makeid(5);
+        ws.send(data);
+        containerElement.innerHTML += `<p>Sent Message: ${data}</p>`;
+      });
+
+      function makeid(length) {
+        let result = "";
+        const characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+          result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+          );
+          counter += 1;
+        }
+        return result;
+      }
+    </script>
+  </body>
+</html>
